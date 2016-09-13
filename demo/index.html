@@ -1,10 +1,17 @@
 <!doctype html>
-<html>
+<html lang="es">
   <head>
     <title>polymerday-twitter-timeline demo</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script>
+      /* this script must run before Polymer is imported */
+      window.Polymer = {
+        dom: 'shadow',
+        lazyRegister: true
+      };
+    </script>
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
@@ -12,6 +19,9 @@
     <link rel="import" href="../polymerday-twitter-timeline.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      .centered {
+        max-width: 700px;
+      }
     </style>
   </head>
   <body>
@@ -20,7 +30,7 @@
       <h3>Basic polymerday-twitter-timeline Demo</h3>
       <demo-snippet>
         <template>
-          <polymerday-twitter-timeline></polymerday-twitter-timeline>
+          <polymerday-twitter-timeline language="es"></polymerday-twitter-timeline>
         </template>
       </demo-snippet>
     </div>

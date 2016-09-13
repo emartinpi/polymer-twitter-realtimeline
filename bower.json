@@ -1,9 +1,30 @@
 {
   "name": "polymerday-twitter-timeline",
+  "version": "1.0.0-alpha.1",
+  "authors": [
+    "Edu Martin <emartinpicado@gmail.com>"
+  ],
   "description": "Twitter timeline for polymerday event",
+  "keywords": [
+    "polymer",
+    "web-component",
+    "web-components",
+    "twitter",
+    "tweet",
+    "timeline"
+  ],
   "main": "polymerday-twitter-timeline.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "socket.io-client": "^1.4.8"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
