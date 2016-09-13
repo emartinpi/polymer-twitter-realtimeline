@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`polymerday-twitter-timeline`
+Twitter timeline for polymerday event
+
+@demo demo/index.html 
+-->
+
+<dom-module id="polymerday-twitter-timeline">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'polymerday-twitter-timeline',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'polymerday-twitter-timeline',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
