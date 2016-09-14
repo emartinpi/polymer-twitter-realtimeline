@@ -6,9 +6,30 @@ Twitter timeline for polymerday event
 
 First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
 
+## config.json file
+
+Create a [Twitter App](https://apps.twitter.com/), config it, get the necessary keys and tokens and put then in config.json file
+
+```
+{
+    "consumer_secret": "your_consumer_secret",
+    "consumer_key": "your_consumer_key",
+    "token": "your_token",
+    "token_secret": "your_secret"
+}
+```
+
+## Server up and Running
+
+```
+$ npm install
+$ node app.js
+```
+
 ## Viewing Your Application
 
 ```
+$ bower install
 $ polymer serve
 ```
 
