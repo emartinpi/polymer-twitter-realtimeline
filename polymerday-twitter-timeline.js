@@ -2,6 +2,7 @@
   Polymer({
     is: 'polymerday-twitter-timeline',
     properties: {
+
       /**
        * hashtag **Required**
        */
@@ -65,16 +66,17 @@
        */
       width: {
         type: Number
-      },
+      }
     },
 
     /**
      * Polymer ready event
      */
-    ready: function(tweetid) {
+    ready: function() {
       twttr.ready(function() {
         var n = 0;
         var twSocket = io.connect('http://localhost:3000');
+
         // twSocket.on('connect', function () {console.log('Connection success');});
         // twSocket.on('connect_error', function () {console.log('Connection failed!');});
         // twSocket.on('connect_timeout', function () {console.log('Connection timeout!');});
@@ -82,8 +84,8 @@
         // twSocket.on('reconnect', function () {console.log('Reconnection success!');});
         // twSocket.on('reconnect_failed', function () {console.log('Reconnection failed!');});
         twSocket.on('tweet', function (tweet) {
-            tweet.n = ++n;
-            this._tweetHandle(tweet);
+          tweet.n = ++n;
+          this._tweetHandle(tweet);
         }.bind(this));
       }.bind(this));
     },
@@ -92,23 +94,23 @@
      * handle the tweet
      */
     _tweetHandle: function(tweet) {
-        if (tweet.n % 5 === 0) {
-            this.async(function() {
-                twttr.widgets.createTweet(
-                    tweet.id_str,
-                    Polymer.dom(this.$.timeline)
-                        .insertBefore(document.createElement('div'), this.$.timeline.firstChild),
-                    {
-                        align: this.align,
-                        cards: this._cards,
-                        conversation: this.conversation,
-                        lang: this.language,
-                        theme: this.theme,
-                        width: this.width
-                    }
-                );
-            });
-        }
+      if (tweet.n % 5 === 0) {
+        this.async(function() {
+          twttr.widgets.createTweet(
+            tweet.id_str,
+            Polymer.dom(this.$.timeline).insertBefore(document.createElement('div'),
+            this.$.timeline.firstChild),
+            {
+              align: this.align,
+              cards: this._cards,
+              conversation: this.conversation,
+              lang: this.language,
+              theme: this.theme,
+              width: this.width
+            }
+          );
+        });
+      }
     },
 
 
