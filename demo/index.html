@@ -13,27 +13,66 @@
       };
     </script>
 
-    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-input/paper-input.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
+    <link rel="import" href="../../iron-form/iron-form.html">
 
     <link rel="import" href="../polymerday-twitter-timeline.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
-      .centered {
-        max-width: 700px;
-      }
     </style>
   </head>
-  <body>
+  <body unresolved>
 
-    <div class="vertical-section-container centered">
-      <h3>Basic polymerday-twitter-timeline Demo</h3>
-      <demo-snippet>
-        <template>
-          <polymerday-twitter-timeline language="es"></polymerday-twitter-timeline>
-        </template>
-      </demo-snippet>
-    </div>
+    <dom-module id="my-demo">
+      <template>
+        <style>
+          :host {
+            display: block;
+            --twitter-timeline: {
+              height: 550px;
+              border-bottom:1px rgba(0, 0, 0, 0.10) solid;
+            };
+          }
+          .centered {
+            max-width: 700px;
+            margin: auto;
+          }
+          paper-button {
+            margin: 10px 0;
+            width: 100%;
+          }
+        </style>
+
+        <div class="vertical-section-container centered">
+          <h3>Basic polymerday-twitter-timeline Demo</h3>
+          <form is="iron-form" id="form">
+            <paper-input id="input" label="hashtag" required>
+              <div prefix>#</div>
+            </paper-input>
+            <paper-button on-click="_doRequest" raised>TRACK</paper-button>
+          </form>
+
+          <polymerday-twitter-timeline
+            id="timeline"
+            language="es"></polymerday-twitter-timeline>
+        </div>
+      </template>
+
+      <script>
+        Polymer({
+            is: "my-demo",
+            _doRequest: function () {
+              if (this.$.form.validate()) {
+                this.$.timeline.hashtag = this.$.input.value;
+              }
+            }
+        });
+      </script>
+
+    </dom-module>
+
+    <my-demo></my-demo>
 
   </body>
 </html>
