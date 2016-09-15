@@ -1,10 +1,18 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="widget-import.html">
 <link rel="import" href="socket.io.html">
 
 <!--
 `polymerday-twitter-timeline`
 Twitter timeline for polymerday event
+
+Example:
+```html
+<polymerday-twitter-timeline language="es"
+                             time-slot="10">
+</polymerday-twitter-timeline>
+```
 
 @demo demo/index.html
 -->
@@ -14,6 +22,8 @@ Twitter timeline for polymerday event
     <style>
       :host {
         display: block;
+        overflow-y:auto;
+        @apply(--twitter-timeline);
       }
       #timeline {
         display: flex;
@@ -37,8 +47,29 @@ Twitter timeline for polymerday event
         -ms-align-content: flex-end;
         -ms-align-items: center;
       }
+      twitterwidget {
+        top: 0;
+      }
+      .twitter-tweet {
+        animation: fade 2s;
+      }
+      @keyframes fade {
+        from {opacity: 0}
+        to {opacity: 1}
+      }
     </style>
+
     <div id="timeline"></div>
+    <iron-ajax auto
+               url="[[trackUrl]]"
+               method="POST"
+               handle-as="json"
+               debounce-duration="300"></iron-ajax>
+    <iron-ajax auto
+               url="[[untrackUrl]]"
+               method="POST"
+               handle-as="json"
+               debounce-duration="300"></iron-ajax>
   </template>
 
   <script src="polymerday-twitter-timeline.js"></script>

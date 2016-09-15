@@ -4,10 +4,43 @@
     properties: {
 
       /**
+       * host:port where your api server code is (no twitter api)
+       */
+      apiUrlBase: {
+        type: String,
+        value: 'http://localhost:3000'
+      },
+
+      /**
        * hashtag **Required**
        */
       hashtag: {
+        type: String,
+        observer: 'hashtagObserver'
+      },
+
+      /**
+       * @private
+       */
+      trackUrl: {
+        type: String,
+        readOnly: true
+      },
+
+      /**
+       * @private
+       */
+      untrackUrl: {
+        readOnly: true,
         type: String
+      },
+
+      /**
+       * @private
+       */
+      untrack: {
+        readOnly: true,
+        type: Function
       },
 
       /**
@@ -65,6 +98,26 @@
        */
       width: {
         type: Number
+      },
+
+      /**
+       * time slot
+       */
+      timeSlot: {
+        type: Number,
+        value: function() {
+          return 10;
+        }
+      },
+
+      /**
+       * arrTweets
+       */
+      arrTweets: {
+        type: Array,
+        value: function() {
+          return [];
+        }
       }
     },
 
@@ -73,8 +126,7 @@
      */
     ready: function() {
       twttr.ready(function() {
-        var n = 0;
-        var twSocket = io.connect('http://localhost:3000');
+        var twSocket = io.connect(this.apiUrlBase);
 
         // twSocket.on('connect', function () {console.log('Connection success');});
         // twSocket.on('connect_error', function () {console.log('Connection failed!');});
@@ -83,7 +135,6 @@
         // twSocket.on('reconnect', function () {console.log('Reconnection success!');});
         // twSocket.on('reconnect_failed', function () {console.log('Reconnection failed!');});
         twSocket.on('tweet', function (tweet) {
-          tweet.n = ++n;
           this._tweetHandle(tweet);
         }.bind(this));
       }.bind(this));
@@ -94,22 +145,20 @@
      * @param {Object} tweet from Twitter stream api
      */
     _tweetHandle: function(tweet) {
-      if (tweet.n % 5 === 0) {
-        this.async(function() {
-          twttr.widgets.createTweet(
-            tweet.id_str,
-            this.$.timeline,
-            {
-              align: this.align,
-              cards: this._cards,
-              conversation: this.conversation,
-              lang: this.language,
-              theme: this.theme,
-              width: this.width
-            }
-          );
-        });
-      }
+      this.async(function() {
+        twttr.widgets.createTweet(
+          tweet.id_str,
+          this.$.timeline,
+          {
+            align: this.align,
+            cards: this._cards,
+            conversation: this.conversation,
+            lang: this.language,
+            theme: this.theme,
+            width: this.width
+          }
+        );
+      });
     },
 
     /**
@@ -117,6 +166,28 @@
      */
     _isExpanded: function(expand) {
       return expand ? '': 'hidden';
+    },
+
+    /**
+     *
+     *
+     * @param {any} hashtag
+     */
+    hashtagObserver: function(hashtag) {
+      hashtag = hashtag.replace(/#/, '');
+
+      //untrack previous hashtag if any
+      if (typeof this.untrack === 'function') {
+        this.untrack();
+      }
+
+      //this line will force a new api call
+      this._setTrackUrl(this.apiUrlBase + '/twitterapi/track/' + hashtag);
+
+      //set new untrack function
+      this._setUntrack(function() {
+        this._setUntrackUrl(this.apiUrlBase + '/twitterapi/untrack/' + hashtag);
+      });
     }
   });
 }());
