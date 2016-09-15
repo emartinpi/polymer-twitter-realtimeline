@@ -43,7 +43,6 @@
 
       /**
        * Loads text components in the specified language. [Twitter language code](https://dev.twitter.com/overview/general/adding-international-support-to-your-apps).
-       *
        * **Note**: does not affect the text of the cited Tweet.
        */
       language: {
@@ -91,15 +90,15 @@
     },
 
     /**
-     * handle the tweet
+     * Tweet handler
+     * @param {Object} tweet from Twitter stream api
      */
     _tweetHandle: function(tweet) {
       if (tweet.n % 5 === 0) {
         this.async(function() {
           twttr.widgets.createTweet(
             tweet.id_str,
-            Polymer.dom(this.$.timeline).insertBefore(document.createElement('div'),
-            this.$.timeline.firstChild),
+            this.$.timeline,
             {
               align: this.align,
               cards: this._cards,
@@ -112,7 +111,6 @@
         });
       }
     },
-
 
     /**
      * @return {String} Returns *hidden* if expand is false.

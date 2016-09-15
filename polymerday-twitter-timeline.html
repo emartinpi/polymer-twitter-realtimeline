@@ -15,6 +15,28 @@ Twitter timeline for polymerday event
       :host {
         display: block;
       }
+      #timeline {
+        display: flex;
+        flex-direction: column-reverse;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-content: flex-end;
+        align-items: center;
+
+        display: -webkit-flex;
+        -webkit-flex-direction: column-reverse;
+        -webkit-flex-wrap: nowrap;
+        -webkit-justify-content: center;
+        -webkit-align-content: flex-end;
+        -webkit-align-items: center;
+
+        display: -ms-flex;
+        -ms-flex-direction: column-reverse;
+        -ms-flex-wrap: nowrap;
+        -ms-justify-content: center;
+        -ms-align-content: flex-end;
+        -ms-align-items: center;
+      }
     </style>
     <div id="timeline"></div>
   </template>
