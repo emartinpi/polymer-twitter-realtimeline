@@ -9,29 +9,32 @@ var cfg = require('./config.json');
 var tw = require('node-tweet-stream')(cfg);
 
 
-// app.get('/', function (req, res) {
-//   res.sendFile(__dirname + '/public/index.html');
-// });
+/************************* API BEGINS ***********************/
 
+//track a hashtag
 var track = express.Router();
 
 track.post('/:hashtag', function(req, res) {
-  console.log('Peticion track!', req.params.hashtag);
+  console.log('Track request: #' + req.params.hashtag);
+  tw.track('#' + req.params.hashtag);
   res.status(200).end();
 });
-app.use('/track', track);
+app.use('/twitterapi/track', track);
 
+//untrack a hashtag
 var untrack = express.Router();
 
-track.post('/:hashtag', function(req, res) {
-  console.log('Peticion untrack!', req.params.hashtag);
+untrack.post('/:hashtag', function(req, res) {
+  console.log('Untrack request: #' + req.params.hashtag);
+  tw.untrack('#' + req.params.hashtag);
   res.status(200).end();
 });
-app.use('/untrack', untrack);
+app.use('/twitterapi/untrack', untrack);
 
-/**
- * on connection event
- */
+/************************** API ENDS ************************/
+
+
+//on connection event
 var users = 0;
 
 io.on('connection', function (socket) {
@@ -41,10 +44,20 @@ io.on('connection', function (socket) {
   });
 });
 
-/**
- * track javascript word
- */
-tw.track('#love');
+tw.on('connect', function () {
+  console.log('Successfully connected to Twitter API');
+});
+
+tw.on('disconnect', function () {
+  console.log('Disconnected');
+});
+
+//on tweet received event
 tw.on('tweet', function(tweet){
   io.emit('tweet', tweet);
+});
+
+//on error event
+tw.on('error', function (err) {
+  console.log(err);
 });
