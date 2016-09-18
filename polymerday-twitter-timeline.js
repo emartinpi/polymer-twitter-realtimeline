@@ -8,7 +8,7 @@
        */
       apiUrlBase: {
         type: String,
-        value: 'http://localhost:3000'
+        value: 'http://localhost:3000/twittertrack'
       },
 
       /**
@@ -16,31 +16,7 @@
        */
       hashtag: {
         type: String,
-        observer: 'hashtagObserver'
-      },
-
-      /**
-       * @private
-       */
-      trackUrl: {
-        type: String,
-        readOnly: true
-      },
-
-      /**
-       * @private
-       */
-      untrackUrl: {
-        readOnly: true,
-        type: String
-      },
-
-      /**
-       * @private
-       */
-      untrack: {
-        readOnly: true,
-        type: Function
+        observer: '_hashtagObserver'
       },
 
       /**
@@ -59,16 +35,7 @@
       },
 
       /**
-       * computed property
-       */
-      _cards: {
-        type: String,
-        computed: '_isExpanded(expand)'
-      },
-
-      /**
-       * When set to *none*, only the cited Tweet will be displayed even if it is
-       * in reply to another Tweet.
+       * When set to *none*, only the cited Tweet will be displayed even if it is in reply to another Tweet.
        */
       conversation: {
         type: String
@@ -84,8 +51,7 @@
       },
 
       /**
-       * When set to *dark*, displays Tweet with light text over a dark
-       * background.
+       * When set to *dark*, displays Tweet with light text over a darkbackground.
        */
       theme: {
         type: String,
@@ -93,15 +59,14 @@
       },
 
       /**
-       * The maximum width of the rendered Tweet in whole pixels. This value
-       * should be between 250 and 550 pixels.
+       * The maximum width of the rendered Tweet in whole pixels. This valueshould be between 250 and 550 pixels.
        */
       width: {
         type: Number
       },
 
       /**
-       * time slot
+       * Minimum period of time it has to be spent to show new tweet
        */
       timeSlot: {
         type: Number,
@@ -111,9 +76,48 @@
       },
 
       /**
+       ************************************
+       ******** Private Properties ********
+       */
+
+      /**
+       * api url to track a hashtag
+       * this.apiUrlBase + /track/ + <hashtag>
+       */
+      _trackUrl: {
+        type: String,
+        readOnly: true
+      },
+
+      /**
+       * api url to untrack a hashtag
+       * this.apiUrlBase + /untrack/ + <hashtag>
+       */
+      _untrackUrl: {
+        readOnly: true,
+        type: String
+      },
+
+      /**
+       * Dynamically created function called to untrack the previos hashtag
+       */
+      _untrackFn: {
+        readOnly: true,
+        type: Function
+      },
+
+      /**
+       * computed property
+       */
+      _cards: {
+        type: String,
+        computed: '_isExpanded(expand)'
+      },
+
+      /**
        * arrTweets
        */
-      arrTweets: {
+      _arrTweets: {
         type: Array,
         value: function() {
           return [];
@@ -126,7 +130,7 @@
      */
     ready: function() {
       twttr.ready(function() {
-        var twSocket = io.connect(this.apiUrlBase);
+        var twSocket = io.connect(this.apiUrl);
 
         // twSocket.on('connect', function () {console.log('Connection success');});
         // twSocket.on('connect_error', function () {console.log('Connection failed!');});
@@ -169,24 +173,24 @@
     },
 
     /**
-     *
-     *
-     * @param {any} hashtag
+     * Hashtag property observer.
+     * Untrack previos hashtag if any, track new hashtag and set new dinamically function tu untrack the new hashtag
+     * @param {String} hashtag
      */
-    hashtagObserver: function(hashtag) {
+    _hashtagObserver: function(hashtag) {
       hashtag = hashtag.replace(/#/, '');
 
       //untrack previous hashtag if any
-      if (typeof this.untrack === 'function') {
-        this.untrack();
+      if (typeof this._untrack === 'function') {
+        this._untrack();
       }
 
       //this line will force a new api call
-      this._setTrackUrl(this.apiUrlBase + '/twitterapi/track/' + hashtag);
+      this._set_trackUrl(this.apiUrl + '/track/' + hashtag);
 
-      //set new untrack function
-      this._setUntrack(function() {
-        this._setUntrackUrl(this.apiUrlBase + '/twitterapi/untrack/' + hashtag);
+      //set new untrack() function to call to untrack the previous hashtag
+      this._set_untrackFn(function() {
+        this._set_untrackUrl(this.apiUrl + '/untrack/' + hashtag);
       });
     }
   });
