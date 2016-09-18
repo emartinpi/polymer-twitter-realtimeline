@@ -19,7 +19,7 @@ track.post('/:hashtag', function(req, res) {
   tw.track('#' + req.params.hashtag);
   res.status(200).end();
 });
-app.use('/twitterapi/track', track);
+app.use('/twitterstream/track', track);
 
 //untrack a hashtag
 var untrack = express.Router();
@@ -29,7 +29,7 @@ untrack.post('/:hashtag', function(req, res) {
   tw.untrack('#' + req.params.hashtag);
   res.status(200).end();
 });
-app.use('/twitterapi/untrack', untrack);
+app.use('/twitterstream/untrack', untrack);
 
 /************************** API ENDS ************************/
 

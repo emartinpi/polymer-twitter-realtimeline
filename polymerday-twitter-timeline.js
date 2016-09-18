@@ -8,7 +8,7 @@
        */
       apiUrlBase: {
         type: String,
-        value: 'http://localhost:3000/twittertrack'
+        value: 'http://localhost:3000'
       },
 
       /**
@@ -66,13 +66,11 @@
       },
 
       /**
-       * Minimum period of time it has to be spent to show new tweet
+       * Minimum period of time that has to be spent to show a new tweet. By default every tweet is shown as soon as possible
        */
-      timeSlot: {
+      elapse: {
         type: Number,
-        value: function() {
-          return 10;
-        }
+        value: 0
       },
 
       /**
@@ -82,7 +80,7 @@
 
       /**
        * api url to track a hashtag
-       * this.apiUrlBase + /track/ + <hashtag>
+       * this.apiUrlBase + /twittertrack/track/ + <hashtag>
        */
       _trackUrl: {
         type: String,
@@ -91,7 +89,7 @@
 
       /**
        * api url to untrack a hashtag
-       * this.apiUrlBase + /untrack/ + <hashtag>
+       * this.apiUrlBase + /twittertrack/untrack/ + <hashtag>
        */
       _untrackUrl: {
         readOnly: true,
@@ -112,16 +110,6 @@
       _cards: {
         type: String,
         computed: '_isExpanded(expand)'
-      },
-
-      /**
-       * arrTweets
-       */
-      _arrTweets: {
-        type: Array,
-        value: function() {
-          return [];
-        }
       }
     },
 
@@ -130,7 +118,8 @@
      */
     ready: function() {
       twttr.ready(function() {
-        var twSocket = io.connect(this.apiUrl);
+        var twSocket = io.connect(this.apiUrlBase);
+        var _tweetHandler = this._createTweetHandler();
 
         // twSocket.on('connect', function () {console.log('Connection success');});
         // twSocket.on('connect_error', function () {console.log('Connection failed!');});
@@ -139,30 +128,38 @@
         // twSocket.on('reconnect', function () {console.log('Reconnection success!');});
         // twSocket.on('reconnect_failed', function () {console.log('Reconnection failed!');});
         twSocket.on('tweet', function (tweet) {
-          this._tweetHandle(tweet);
+          _tweetHandler(tweet);
         }.bind(this));
       }.bind(this));
     },
 
+
     /**
-     * Tweet handler
-     * @param {Object} tweet from Twitter stream api
+     * Tweet handler.
+     * @returns {Function} Function that process the tweet and when it must be drawn depending on elapse property
      */
-    _tweetHandle: function(tweet) {
-      this.async(function() {
-        twttr.widgets.createTweet(
-          tweet.id_str,
-          this.$.timeline,
-          {
-            align: this.align,
-            cards: this._cards,
-            conversation: this.conversation,
-            lang: this.language,
-            theme: this.theme,
-            width: this.width
-          }
-        );
-      });
+    _createTweetHandler: function() {
+      var currentTweet, mustBeDrawn;
+
+      currentTweet = 0;
+      mustBeDrawn = 0;
+
+      return this.elapse === 0 ? (function(tweet) {
+        this.async(function() {
+          this._drawTweet(tweet);
+        });
+      }.bind(this)) : (function(tweet) {
+        var diff, time;
+
+        currentTweet = performance.now();
+        diff = currentTweet - mustBeDrawn;
+        time = diff < 0 ? Math.abs(diff) : 0;
+        mustBeDrawn = (diff < 0 ? mustBeDrawn : currentTweet) + this.elapse;
+
+        this.async(function() {
+          this._drawTweet(tweet);
+        }, time);
+      }.bind(this));
     },
 
     /**
@@ -181,17 +178,36 @@
       hashtag = hashtag.replace(/#/, '');
 
       //untrack previous hashtag if any
-      if (typeof this._untrack === 'function') {
-        this._untrack();
+      if (typeof this._untrackFn === 'function') {
+        this._untrackFn();
       }
 
       //this line will force a new api call
-      this._set_trackUrl(this.apiUrl + '/track/' + hashtag);
+      this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + hashtag);
 
       //set new untrack() function to call to untrack the previous hashtag
       this._set_untrackFn(function() {
-        this._set_untrackUrl(this.apiUrl + '/untrack/' + hashtag);
+        this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + hashtag);
       });
+    },
+
+    /**
+     * Calls Twitter for Websits widgets to get the look and feel of a tweet
+     * @param {Object} tweet object from Twitter stream API
+     */
+    _drawTweet: function(tweet) {
+      twttr.widgets.createTweet(
+        tweet.id_str,
+        this.$.timeline,
+        {
+          align: this.align,
+          cards: this._cards,
+          conversation: this.conversation,
+          lang: this.language,
+          theme: this.theme,
+          width: this.width
+        }
+      );
     }
   });
 }());
