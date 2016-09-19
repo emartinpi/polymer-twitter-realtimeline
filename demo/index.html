@@ -16,7 +16,9 @@
     <link rel="import" href="../../paper-input/paper-input.html">
     <link rel="import" href="../../paper-button/paper-button.html">
     <link rel="import" href="../../iron-form/iron-form.html">
-
+    <link rel="import" href="../../polymerfire/firebase-app.html">
+    <link rel="import" href="../../polymerfire/firebase-auth.html">
+    <link rel="import" href="../../polymerfire/firebase-document.html">
     <link rel="import" href="../polymerday-twitter-timeline.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -45,6 +47,29 @@
           }
         </style>
 
+        <firebase-app
+          auth-domain="polysummitcodelab-ae4ce.firebaseapp.com"
+          database-url="https://polysummitcodelab-ae4ce.firebaseio.com"
+          api-key="AIzaSyBo0lhBXK037xJSDOb-NMuiIcP21R4JsXQ"
+          storage-bucket="polysummitcodelab-ae4ce.appspot.com"></firebase-app>
+        <firebase-auth
+          id="auth"
+          provider="anonymous"
+          user="{{user}}"
+          on-error="onFirebaseError"></firebase-auth>
+        <firebase-document
+          path="[[activeTalkPath]]"
+          data="{{activeTalk}}"></firebase-document>
+
+        <iron-ajax
+          auto
+          url="[[_trackUrl]]"
+          method="POST"></iron-ajax>
+        <iron-ajax
+          auto
+          url="[[_untrackUrl]]"
+          method="POST"></iron-ajax>
+
         <div class="vertical-section-container centered">
           <h3>Basic polymerday-twitter-timeline Demo</h3>
           <form is="iron-form" id="form">
@@ -53,16 +78,6 @@
             </paper-input>
             <paper-button on-click="_doRequest" raised>TRACK</paper-button>
           </form>
-
-          <iron-ajax
-            auto
-            url="[[_trackUrl]]"
-            method="POST"></iron-ajax>
-          <iron-ajax
-            auto
-            url="[[_untrackUrl]]"
-            method="POST"></iron-ajax>
-
 
           <polymerday-twitter-timeline
             api-url-base="[[apiUrlBase]]"
@@ -98,7 +113,32 @@
               _untrackFn: {
                 readOnly: true,
                 type: Function
+              },
+
+              activeTalk: {
+                type: String,
+                observer: 'activeTalkObserver'
+              },
+
+              user: {
+                type: Object,
+                value: null,
+                observer: '_computeUserData'
               }
+            },
+
+            _computeUserData: function(user) {
+              if (user) {
+                this.set('activeTalkPath', '/active/text');
+              }
+            },
+
+            activeTalkObserver: function(data) {
+              console.log(data);
+            },
+
+            ready: function() {
+              this.signInAnonymously();
             },
 
             _hashtagObserver: function(_hashtag) {
@@ -116,6 +156,17 @@
               this._set_untrackFn(function() {
                 this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + _hashtag);
               });
+            },
+
+            signInAnonymously: function() {
+              this.$.auth
+                .signInAnonymously()
+                  .then(function(user) {
+                    //ok
+                  }.bind(this))
+                  .catch(function(err) {
+                    console.log('Error connecting to database');
+                  }.bind(this));
             },
 
             _doRequest: function() {
