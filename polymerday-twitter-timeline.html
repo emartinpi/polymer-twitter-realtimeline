@@ -9,9 +9,9 @@ Twitter timeline for polymerday event
 
 Example:
 ```html
-<polymerday-twitter-timeline language="es"
-                             time-slot="10">
-</polymerday-twitter-timeline>
+<polymerday-twitter-timeline
+            api-url-base="[[apiUrlBase]]"
+            ></polymerday-twitter-timeline>
 ```
 
 @demo demo/index.html
@@ -60,16 +60,6 @@ Example:
     </style>
 
     <div id="timeline"></div>
-    <iron-ajax auto
-               url="[[_trackUrl]]"
-               method="POST"
-               handle-as="json"
-               debounce-duration="300"></iron-ajax>
-    <iron-ajax auto
-               url="[[_untrackUrl]]"
-               method="POST"
-               handle-as="json"
-               debounce-duration="300"></iron-ajax>
   </template>
 
   <script src="polymerday-twitter-timeline.js"></script>

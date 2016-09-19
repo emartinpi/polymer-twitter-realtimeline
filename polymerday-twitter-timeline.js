@@ -7,16 +7,7 @@
        * host:port where your api server code is (no twitter api)
        */
       apiUrlBase: {
-        type: String,
-        value: 'http://localhost:3000'
-      },
-
-      /**
-       * hashtag **Required**
-       */
-      hashtag: {
-        type: String,
-        observer: '_hashtagObserver'
+        type: String
       },
 
       /**
@@ -66,7 +57,7 @@
       },
 
       /**
-       * Minimum period of time that has to be spent to show a new tweet. By default every tweet is shown as soon as possible
+       * Minimum period of time (ms) that has to be spent to show a new tweet. By default every tweet is shown as soon as possible
        */
       elapse: {
         type: Number,
@@ -77,32 +68,6 @@
        ************************************
        ******** Private Properties ********
        */
-
-      /**
-       * api url to track a hashtag
-       * this.apiUrlBase + /twittertrack/track/ + <hashtag>
-       */
-      _trackUrl: {
-        type: String,
-        readOnly: true
-      },
-
-      /**
-       * api url to untrack a hashtag
-       * this.apiUrlBase + /twittertrack/untrack/ + <hashtag>
-       */
-      _untrackUrl: {
-        readOnly: true,
-        type: String
-      },
-
-      /**
-       * Dynamically created function called to untrack the previos hashtag
-       */
-      _untrackFn: {
-        readOnly: true,
-        type: Function
-      },
 
       /**
        * computed property
@@ -118,6 +83,12 @@
      */
     ready: function() {
       twttr.ready(function() {
+
+        if (!this.apiUrlBase) {
+          this._log(this._logf('apiUrlBase', 'apiUrlBase must not be undefined'));
+          return;
+        }
+
         var twSocket = io.connect(this.apiUrlBase);
         var _tweetHandler = this._createTweetHandler();
 
@@ -127,8 +98,8 @@
         // twSocket.on('reconnect_attempt', function () {console.log('Reconnection attemp!');});
         // twSocket.on('reconnect', function () {console.log('Reconnection success!');});
         // twSocket.on('reconnect_failed', function () {console.log('Reconnection failed!');});
-        twSocket.on('tweet', function (tweet) {
-          _tweetHandler(tweet);
+        twSocket.on('tweet', function (data) {
+          _tweetHandler(data);
         }.bind(this));
       }.bind(this));
     },
@@ -139,26 +110,43 @@
      * @returns {Function} Function that process the tweet and when it must be drawn depending on elapse property
      */
     _createTweetHandler: function() {
-      var currentTweet, mustBeDrawn;
+      var currentTweet, mustBeDrawn, arrTimeoutId, hashtag;
 
       currentTweet = 0;
       mustBeDrawn = 0;
+      arrTimeoutId = [];
 
-      return this.elapse === 0 ? (function(tweet) {
+      return this.elapse === 0 ? (function(data) {
+
+        //this function will be run as at microtask timing
         this.async(function() {
-          this._drawTweet(tweet);
+          this._drawTweet(data.tweet);
         });
-      }.bind(this)) : (function(tweet) {
-        var diff, time;
+      }.bind(this)) : (function(data) {
+
+        var diff, time, timeoutId;
+
+        //check if necessary to cancel async functions and reninitialize values due to a new hashtag track
+        if (data.hashtag !== hashtag) {
+          arrTimeoutId.forEach(function(timeoutId) {
+            this.cancelAsync(timeoutId);
+          }, this);
+          hashtag = data.hashtag;
+          arrTimeoutId = [];
+          mustBeDrawn = 0;
+        }
 
         currentTweet = performance.now();
         diff = currentTweet - mustBeDrawn;
         time = diff < 0 ? Math.abs(diff) : 0;
         mustBeDrawn = (diff < 0 ? mustBeDrawn : currentTweet) + this.elapse;
 
-        this.async(function() {
-          this._drawTweet(tweet);
+        //this function will be run with a calculated delay
+        timeoutId = this.async(function() {
+          this._drawTweet(data.tweet);
         }, time);
+        arrTimeoutId.push(timeoutId);
+
       }.bind(this));
     },
 
@@ -167,28 +155,6 @@
      */
     _isExpanded: function(expand) {
       return expand ? '': 'hidden';
-    },
-
-    /**
-     * Hashtag property observer.
-     * Untrack previos hashtag if any, track new hashtag and set new dinamically function tu untrack the new hashtag
-     * @param {String} hashtag
-     */
-    _hashtagObserver: function(hashtag) {
-      hashtag = hashtag.replace(/#/, '');
-
-      //untrack previous hashtag if any
-      if (typeof this._untrackFn === 'function') {
-        this._untrackFn();
-      }
-
-      //this line will force a new api call
-      this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + hashtag);
-
-      //set new untrack() function to call to untrack the previous hashtag
-      this._set_untrackFn(function() {
-        this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + hashtag);
-      });
     },
 
     /**

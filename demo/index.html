@@ -54,19 +54,73 @@
             <paper-button on-click="_doRequest" raised>TRACK</paper-button>
           </form>
 
+          <iron-ajax
+            auto
+            url="[[_trackUrl]]"
+            method="POST"></iron-ajax>
+          <iron-ajax
+            auto
+            url="[[_untrackUrl]]"
+            method="POST"></iron-ajax>
+
+
           <polymerday-twitter-timeline
-            id="timeline"
-            api-url-base="http://localhost:3000"
-            language="es"></polymerday-twitter-timeline>
+            api-url-base="[[apiUrlBase]]"
+            language="es"
+            elapse="0"></polymerday-twitter-timeline>
         </div>
       </template>
 
       <script>
         Polymer({
             is: "my-demo",
-            _doRequest: function () {
+            properties: {
+
+              apiUrlBase: {
+                type: String
+              },
+
+              _hashtag: {
+                type: String,
+                observer: '_hashtagObserver'
+              },
+
+              _trackUrl: {
+                type: String,
+                readOnly: true
+              },
+
+              _untrackUrl: {
+                type: String,
+                readOnly: true
+              },
+
+              _untrackFn: {
+                readOnly: true,
+                type: Function
+              }
+            },
+
+            _hashtagObserver: function(_hashtag) {
+              _hashtag = _hashtag.replace(/#/, '');
+
+              //untrack previous hashtag if any
+              if (typeof this._untrackFn === 'function') {
+                this._untrackFn();
+              }
+
+              //this line will force a new api call
+              this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + _hashtag);
+
+              //set new untrack() function to call to untrack the previous hashtag
+              this._set_untrackFn(function() {
+                this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + _hashtag);
+              });
+            },
+
+            _doRequest: function() {
               if (this.$.form.validate()) {
-                this.$.timeline.hashtag = this.$.input.value;
+                this.set('_hashtag', this.$.input.value);
               }
             }
         });
@@ -74,7 +128,7 @@
 
     </dom-module>
 
-    <my-demo></my-demo>
+    <my-demo api-url-base="http://localhost:3000"></my-demo>
 
   </body>
 </html>

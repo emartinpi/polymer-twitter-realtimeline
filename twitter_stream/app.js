@@ -7,7 +7,7 @@ var server = app.listen(3000, function () {
 var io = require('socket.io')(server);
 var cfg = require('./config.json');
 var tw = require('node-tweet-stream')(cfg);
-
+var hashtag;
 
 /************************* API BEGINS ***********************/
 
@@ -17,6 +17,7 @@ var track = express.Router();
 track.post('/:hashtag', function(req, res) {
   console.log('Track request: #' + req.params.hashtag);
   tw.track('#' + req.params.hashtag);
+  hashtag = req.params.hashtag;
   res.status(200).end();
 });
 app.use('/twitterstream/track', track);
@@ -27,6 +28,7 @@ var untrack = express.Router();
 untrack.post('/:hashtag', function(req, res) {
   console.log('Untrack request: #' + req.params.hashtag);
   tw.untrack('#' + req.params.hashtag);
+  hashtag = '';
   res.status(200).end();
 });
 app.use('/twitterstream/untrack', untrack);
@@ -54,7 +56,10 @@ tw.on('disconnect', function () {
 
 //on tweet received event
 tw.on('tweet', function(tweet){
-  io.emit('tweet', tweet);
+  io.emit('tweet', {
+    hashtag: hashtag,
+    tweet: tweet
+  });
 });
 
 //on error event
