@@ -92,7 +92,8 @@
             properties: {
 
               apiUrlBase: {
-                type: String
+                type: String,
+                value: 'http://localhost:3000'
               },
 
               user: {
@@ -134,7 +135,7 @@
 
             _computeUserData: function(user) {
               if (user) {
-                this.set('_hashtagPath', '/active/talks/active');
+                this.set('_hashtagPath', '/hashtag/to/track');
               }
             },
 
@@ -167,7 +168,7 @@
 
     </dom-module>
 
-    <my-demo api-url-base="http://localhost:3000"></my-demo>
+    <my-demo></my-demo>
 
   </body>
 </html>
