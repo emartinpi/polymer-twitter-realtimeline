@@ -58,8 +58,8 @@
           user="{{user}}"
           on-error="onFirebaseError"></firebase-auth>
         <firebase-document
-          path="[[activeTalkPath]]"
-          data="{{activeTalk}}"></firebase-document>
+          path="[[_hashtagPath]]"
+          data="{{_hashtag}}"></firebase-document>
 
         <iron-ajax
           auto
@@ -95,6 +95,12 @@
                 type: String
               },
 
+              user: {
+                type: Object,
+                value: null,
+                observer: '_computeUserData'
+              },
+
               _hashtag: {
                 type: String,
                 observer: '_hashtagObserver'
@@ -108,54 +114,11 @@
               _untrackUrl: {
                 type: String,
                 readOnly: true
-              },
-
-              _untrackFn: {
-                readOnly: true,
-                type: Function
-              },
-
-              activeTalk: {
-                type: String,
-                observer: 'activeTalkObserver'
-              },
-
-              user: {
-                type: Object,
-                value: null,
-                observer: '_computeUserData'
               }
-            },
-
-            _computeUserData: function(user) {
-              if (user) {
-                this.set('activeTalkPath', '/active/text');
-              }
-            },
-
-            activeTalkObserver: function(data) {
-              console.log(data);
             },
 
             ready: function() {
               this.signInAnonymously();
-            },
-
-            _hashtagObserver: function(_hashtag) {
-              _hashtag = _hashtag.replace(/#/, '');
-
-              //untrack previous hashtag if any
-              if (typeof this._untrackFn === 'function') {
-                this._untrackFn();
-              }
-
-              //this line will force a new api call
-              this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + _hashtag);
-
-              //set new untrack() function to call to untrack the previous hashtag
-              this._set_untrackFn(function() {
-                this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + _hashtag);
-              });
             },
 
             signInAnonymously: function() {
@@ -168,6 +131,31 @@
                     console.log('Error connecting to database');
                   }.bind(this));
             },
+
+            _computeUserData: function(user) {
+              if (user) {
+                this.set('_hashtagPath', '/active/talks/active');
+              }
+            },
+
+            _hashtagObserver: function(_hashtag, _oldhashtag) {
+              //untrack previous hashtag if any
+              if (typeof _hashtag !== 'string') {
+                return;
+              }
+
+              if (typeof _oldhashtag === 'string') {
+                this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + _oldhashtag)
+              }
+
+              _hashtag = _hashtag.replace(/#/, '');
+               this.$.input.value = _hashtag;
+
+              //this line will force a new api call
+              this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + _hashtag);
+            },
+
+
 
             _doRequest: function() {
               if (this.$.form.validate()) {
