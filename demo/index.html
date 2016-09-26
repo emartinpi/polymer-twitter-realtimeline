@@ -55,8 +55,7 @@
         <firebase-auth
           id="auth"
           provider="anonymous"
-          user="{{user}}"
-          on-error="onFirebaseError"></firebase-auth>
+          user="{{user}}"></firebase-auth>
         <firebase-document
           path="[[_hashtagPath]]"
           data="{{_hashtag}}"></firebase-document>
@@ -65,10 +64,10 @@
           auto
           url="[[_trackUrl]]"
           method="POST"></iron-ajax>
-        <iron-ajax
+        <!--iron-ajax
           auto
           url="[[_untrackUrl]]"
-          method="POST"></iron-ajax>
+          method="POST"></iron-ajax-->
 
         <div class="vertical-section-container centered">
           <h3>Basic polymer-twitter-realtimeline Demo</h3>
@@ -110,11 +109,6 @@
               _trackUrl: {
                 type: String,
                 readOnly: true
-              },
-
-              _untrackUrl: {
-                type: String,
-                readOnly: true
               }
             },
 
@@ -140,23 +134,16 @@
             },
 
             _hashtagObserver: function(_hashtag, _oldhashtag) {
-              //untrack previous hashtag if any
               if (typeof _hashtag !== 'string') {
                 return;
               }
 
-              if (typeof _oldhashtag === 'string') {
-                this._set_untrackUrl(this.apiUrlBase + '/twitterstream/untrack/' + _oldhashtag)
-              }
-
               _hashtag = _hashtag.replace(/#/, '');
-               this.$.input.value = _hashtag;
+              this.$.input.value = _hashtag;
 
               //this line will force a new api call
               this._set_trackUrl(this.apiUrlBase + '/twitterstream/track/' + _hashtag);
             },
-
-
 
             _doRequest: function() {
               if (this.$.form.validate()) {
