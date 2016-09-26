@@ -1,6 +1,6 @@
-# \<polymerday-twitter-timeline\>
+# \<polymer-twitter-realtimeline\>
 
-Twitter timeline for polymerday event. It will track a 'active' hashtag from firebase
+Twitter real timeline. It will track a 'active' hashtag from firebase
 
 ## Install the Polymer-CLI
 

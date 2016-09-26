@@ -1,6 +1,6 @@
 (function(){
   Polymer({
-    is: 'polymerday-twitter-timeline',
+    is: 'polymer-twitter-realtimeline',
     properties: {
 
       /**

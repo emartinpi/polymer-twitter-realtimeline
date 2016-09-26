@@ -1,10 +1,10 @@
 {
-  "name": "polymerday-twitter-timeline",
+  "name": "polymer-twitter-realtimeline",
   "version": "1.0.0",
   "authors": [
     "Edu Martin <emartinpicado@gmail.com>"
   ],
-  "description": "Twitter timeline for polymerday event",
+  "description": "Twitter real timeline",
   "keywords": [
     "polymer",
     "web-component",
@@ -13,7 +13,7 @@
     "tweet",
     "timeline"
   ],
-  "main": "polymerday-twitter-timeline.html",
+  "main": "polymer-twitter-realtimeline.html",
   "license": "MIT",
   "ignore": [
     "**/.*",

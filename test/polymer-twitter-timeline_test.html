@@ -2,28 +2,28 @@
 
 <html>
   <head>
-    <title>polymerday-twitter-timeline test</title>
+    <title>polymer-twitter-realtimeline test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../polymerday-twitter-timeline.html">
+    <link rel="import" href="../polymer-twitter-realtimeline.html">
   </head>
   <body>
 
     <test-fixture id="basic">
       <template>
-        <polymerday-twitter-timeline></polymerday-twitter-timeline>
+        <polymer-twitter-realtimeline></polymer-twitter-realtimeline>
       </template>
     </test-fixture>
 
     <script>
-      suite('polymerday-twitter-timeline', function() {
+      suite('polymer-twitter-realtimeline', function() {
 
         test('instantiating the element works', function() {
           var element = fixture('basic');
-          assert.equal(element.is, 'polymerday-twitter-timeline');
+          assert.equal(element.is, 'polymer-twitter-realtimeline');
         });
 
       });
