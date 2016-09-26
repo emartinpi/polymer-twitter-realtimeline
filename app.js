@@ -7,7 +7,7 @@ var server = app.listen(3000, function () {
 var io = require('socket.io')(server);
 var cfg = require('./config.json');
 var Twit = new require('twit')(cfg);
-var hashtag = '', stream;
+var hashtag = '', stream, users;
 
 /************************* API BEGINS ***********************/
 
@@ -42,7 +42,7 @@ app.use('/twitterstream/untrack', untrack);
 
 
 // SocketIO connection & disconect event
-var users = 0;
+users = 0;
 
 io.on('connection', function (socket) {
   console.log('User connected!! Users: ', ++users);
