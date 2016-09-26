@@ -38,14 +38,15 @@ The database mush have a path, you can change it in demo code. By default (activ
 
 ```html
 $ npm install
-$ node twitter_stream/app.js
+$ node app.js
 ```
 
 ## Viewing Your Application
 
 ```
-$ bower install
-$ polymer serve
+$ cd public
+public$ bower install
+public$ polymer serve
 ```
 
 ## Building Your Application

@@ -1,0 +1,6 @@
+{
+  "consumer_secret": "your_consumer_secret",
+  "consumer_key": "your_consumer_key",
+  "token": "your_token",
+  "token_secret": "your_token_secret"
+}
