@@ -6,8 +6,8 @@ var server = app.listen(3000, function () {
 });
 var io = require('socket.io')(server);
 var cfg = require('./config.json');
-var tw = require('node-tweet-stream')(cfg);
-var hashtag;
+var Twit = new require('twit')(cfg);
+var hashtag = '', stream;
 
 /************************* API BEGINS ***********************/
 
@@ -15,20 +15,25 @@ var hashtag;
 var track = express.Router();
 
 track.post('/:hashtag', function(req, res) {
-  console.log('Track request: #' + req.params.hashtag);
-  tw.track('#' + req.params.hashtag);
+
+  // stop tracking a hashtag if any
+  if (hashtag !== '') {
+    handleStopRequest();
+  }
+
   hashtag = req.params.hashtag;
+  handleStreamRequest();
+
   res.status(200).end();
 });
 app.use('/twitterstream/track', track);
+
 
 //untrack a hashtag
 var untrack = express.Router();
 
 untrack.post('/:hashtag', function(req, res) {
-  console.log('Untrack request: #' + req.params.hashtag);
-  tw.untrack('#' + req.params.hashtag);
-  hashtag = '';
+  handleStopRequest();
   res.status(200).end();
 });
 app.use('/twitterstream/untrack', untrack);
@@ -36,7 +41,7 @@ app.use('/twitterstream/untrack', untrack);
 /************************** API ENDS ************************/
 
 
-//on connection event
+// SocketIO connection & disconect event
 var users = 0;
 
 io.on('connection', function (socket) {
@@ -46,23 +51,42 @@ io.on('connection', function (socket) {
   });
 });
 
-tw.on('connect', function () {
-  console.log('Successfully connected to Twitter API');
-});
 
-tw.on('disconnect', function () {
-  console.log('Disconnected');
-});
+/**
+ * handle the track of a hashtag
+ */
+function handleStreamRequest() {
+  console.log('Track request: #' + hashtag);
+  stream = Twit.stream('statuses/filter', { track: '#' + hashtag });
 
-//on tweet received event
-tw.on('tweet', function(tweet){
-  io.emit('tweet', {
-    hashtag: hashtag,
-    tweet: tweet
+  // connect event
+  stream.on('connect', function () {
+    console.log('Successfully connected to Twitter API for: #' + hashtag);
   });
-});
 
-//on error event
-tw.on('error', function (err) {
-  console.log(err);
-});
+  // disconnect event
+  stream.on('disconnect', function () {
+    console.log('Disconnected');
+  });
+
+  // error event
+  stream.on('error', function (err) {
+    console.log(err);
+  });
+
+  // tweet event
+  stream.on('tweet', function (tweet) {
+
+    // send event to the client throught SocketIO
+    io.emit('tweet', {
+      hashtag: hashtag,
+      tweet: tweet
+    });
+  });
+}
+
+function handleStopRequest() {
+  console.log('Untrack request: #' + hashtag);
+  stream.stop();
+  hashtag = '';
+}
