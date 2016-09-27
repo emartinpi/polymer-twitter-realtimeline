@@ -34,14 +34,14 @@ The database mush have a path, you can change it in demo code. By default (activ
 
 ![path](https://cloud.githubusercontent.com/assets/10350688/18666822/1b2f229e-7f2e-11e6-947c-40214ea45330.png)
 
-## Server up and Running
+## Server up and Running (It's in charge of Twitter stream connection)
 
 ```html
 $ npm install
 $ node app.js
 ```
 
-## Viewing Your Application
+## Viewing Your Application and Demo
 
 ```
 $ cd public
@@ -49,27 +49,4 @@ public$ bower install
 public$ polymer serve
 ```
 
-## Building Your Application
-
-```
-$ polymer build
-```
-
-This will create a `build/` folder with `bundled/` and `unbundled/` sub-folders
-containing a bundled (Vulcanized) and unbundled builds, both run through HTML,
-CSS, and JS optimizers.
-
-You can serve the built versions by giving `polymer serve` a folder to serve
-from:
-
-```
-$ polymer serve build/bundled
-```
-
-## Running Tests
-
-```
-$ polymer test
-```
-
-Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
+Take a look at demo code to know how to use the componet

@@ -1,8 +1,8 @@
 
 var express = require('express');
 var app = express();
-
 var cfg = require('./config.json');
+
 app.set('port', (process.env.PORT || 3000));
 app.set('consumer_key', (process.env.consumer_key || cfg.consumer_key));
 app.set('consumer_secret', (process.env.consumer_secret || cfg.consumer_secret));
