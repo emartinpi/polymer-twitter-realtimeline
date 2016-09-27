@@ -1,12 +1,25 @@
 
 var express = require('express');
 var app = express();
-var server = app.listen(3000, function () {
-  console.log('App listening on port 3000...');
+
+var cfg = require('./config.json');
+app.set('port', (process.env.PORT || 3000));
+app.set('consumer_key', (process.env.consumer_key || cfg.consumer_key));
+app.set('consumer_secret', (process.env.consumer_secret || cfg.consumer_secret));
+app.set('access_token', (process.env.access_token || cfg.access_token));
+app.set('access_token_secret', (process.env.access_token_secret || cfg.access_token_secret));
+
+var server = app.listen(app.get('port'), function () {
+  console.log('App listening on port ' + app.get('port'));
 });
 var io = require('socket.io')(server);
-var cfg = require('./config.json');
-var Twit = new require('twit')(cfg);
+
+var Twit = new require('twit')({
+  consumer_key: app.get('consumer_key'),
+  consumer_secret: app.get('consumer_secret'),
+  access_token: app.get('access_token'),
+  access_token_secret: app.get('access_token_secret')
+});
 var hashtag = '', stream, users;
 
 /************************* API BEGINS ***********************/
@@ -24,7 +37,10 @@ track.post('/:hashtag', function(req, res) {
   hashtag = req.params.hashtag;
   handleStreamRequest();
 
-  res.status(200).end();
+  res
+    .set('Access-Control-Allow-Origin', '*')
+    .status(200)
+    .end();
 });
 app.use('/twitterstream/track', track);
 
@@ -34,7 +50,10 @@ var untrack = express.Router();
 
 untrack.post('/:hashtag', function(req, res) {
   handleStopRequest();
-  res.status(200).end();
+  res
+    .set('Access-Control-Allow-Origin', '*')
+    .status(200)
+    .end();
 });
 app.use('/twitterstream/untrack', untrack);
 

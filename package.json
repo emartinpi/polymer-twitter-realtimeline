@@ -2,11 +2,15 @@
   "name": "twit-stream",
   "version": "1.0.0",
   "description": "Twit stream",
+  "author": "Edu Martin",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Edu Martin",
+  "engines": {
+    "node": "4.5.0"
+  },
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
