@@ -1,13 +1,12 @@
 
 var express = require('express');
 var app = express();
-var cfg = require('./config.json');
 
 app.set('port', (process.env.PORT || 3000));
-app.set('consumer_key', (process.env.consumer_key || cfg.consumer_key));
-app.set('consumer_secret', (process.env.consumer_secret || cfg.consumer_secret));
-app.set('access_token', (process.env.access_token || cfg.access_token));
-app.set('access_token_secret', (process.env.access_token_secret || cfg.access_token_secret));
+app.set('consumer_key', (process.env.consumer_key || require('./config.json').consumer_key));
+app.set('consumer_secret', (process.env.consumer_secret || require('./config.json').consumer_secret));
+app.set('access_token', (process.env.access_token || require('./config.json').access_token));
+app.set('access_token_secret', (process.env.access_token_secret || require('./config.json').access_token_secret));
 
 var server = app.listen(app.get('port'), function () {
   console.log('App listening on port ' + app.get('port'));
